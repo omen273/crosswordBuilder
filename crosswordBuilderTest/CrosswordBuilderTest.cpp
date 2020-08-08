@@ -6,6 +6,7 @@
 
 #include "../crosswordBuilder/WordRandomizer.h"
 #include "../crosswordBuilder/Utils.h"
+#include "testUtils.h"
 
 using namespace Utils;
 
@@ -42,10 +43,11 @@ TEST(crosswordBuilderTest, impossibleToBuildTest)
 	auto test = [](std::vector<std::string>& inp)
 	{
 		toUpper(inp.begin(), inp.end());
-		ASSERT_FALSE(CrosswordBuilder::build(inp));
+		testUtils::testException([&inp]() { CrosswordBuilder::build(inp); }, "Impossible to intersect these words.");
 	};
 
 	test(std::vector<std::string>{"veldt", "jynx", "grimps", "waqf", "zho", "buck"});
+	testUtils::testException([]() { CrosswordBuilder::build(toUpper({"sophistication", "cat"}), 12); }, "The input consists too long word: SOPHISTICATION");
 }
 
 TEST(crosswordBuilderTest, randomBuilds)
