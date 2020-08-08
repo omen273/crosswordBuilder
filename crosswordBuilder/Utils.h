@@ -1,0 +1,194 @@
+#pragma once
+#include <array>
+#include <compare>
+#include <queue>
+#include <stdexcept>
+#include <string>
+#include <tuple>
+#include <unordered_set>
+#include <vector>
+
+
+namespace Utils
+{
+	struct Intersection final
+	{
+		Intersection(std::size_t x, std::size_t y) noexcept : firstWordPos(x), secondWordPos(y) {}
+		std::size_t firstWordPos;
+		std::size_t secondWordPos;
+
+		[[nodiscard]] auto operator<=>(const Intersection&) const = default;
+	};
+
+	//works only for Latin big letters
+	[[nodiscard]] auto inline findIntersections(const std::string& str1, const std::string& str2)
+	{
+		std::vector<Intersection> res;
+		std::array<std::vector<std::size_t>, 26> lettersStr;
+		for (std::size_t i = 0; i < str1.size(); ++i) lettersStr[str1[i] - 'A'].push_back(i);
+		for (std::size_t i = 0; i < str2.size(); ++i)
+		{
+			for (auto pos1 : lettersStr[str2[i] - 'A']) res.emplace_back(pos1, i);
+		}
+
+		return res;
+	}
+
+	struct wordsHashOrdered final
+	{
+		template<typename T>
+		[[nodiscard]] auto operator()(const std::pair<T, T>& p) const noexcept
+		{
+			std::size_t h1 = std::hash<T>{}(p.first);
+			std::size_t h2 = std::hash<T>{}(p.second);
+			return h1 ^ (h2 << 1);
+		}
+	};
+
+	[[nodiscard]] auto inline isPossibileToIntersect(const std::vector<std::string>& words)
+	{
+		if (words.size() < 2) [[unlikely]] throw std::runtime_error{ "Input consists less than two words." };
+		std::queue < std::pair<std::size_t, std::vector<std::size_t>>> q;
+		std::vector<std::size_t> firstWordIntersections;
+		for (std::size_t i = 1; i < words.size(); ++i)
+		{
+			if (!findIntersections(words[0], words[i]).empty()) firstWordIntersections.push_back(i);
+		}
+		q.push({ 0 , std::move(firstWordIntersections) });
+		std::vector<std::size_t> visited(words.size());
+		while (!q.empty())
+		{
+			auto front = std::move(q.front());
+			q.pop();
+			visited[front.first] = true;
+			for (auto n : front.second)
+			{
+				std::vector<std::size_t> wordIntersections;
+				for (std::size_t i = 0; i < words.size(); ++i)
+				{
+					if (!visited[n] && !findIntersections(words[n], words[i]).empty())
+					{
+						wordIntersections.push_back(i);
+					}
+				}
+				if (!wordIntersections.empty()) q.push({ n, std::move(wordIntersections) });
+			}
+		}
+		return std::all_of(visited.begin(), visited.end(), [](auto is) {return is; });
+	}
+
+	struct Position final
+	{
+		int x;
+		int y;
+
+		auto& operator+=(const Position& pos) noexcept
+		{
+			x += pos.x, y += pos.y;
+			return *this;
+		}
+
+		[[nodiscard]] friend auto operator+(Position first, const Position& second) noexcept
+		{
+			return first += second;
+		}
+
+		[[nodiscard]] auto operator<=>(const Position&) const = default;
+	};
+
+	struct positionHash final
+	{
+		[[nodiscard]] auto operator()(const Position& p) const noexcept
+		{
+			auto h1 = std::hash<int>{}(p.x);
+			auto h2 = std::hash<int>{}(p.y);
+			return h1 ^ (h2 << 1);
+		}
+	};
+
+	struct Limits final
+	{
+		int top;
+		int right;
+		int bottom;
+		int left;
+
+		[[nodiscard]] friend auto operator==(const Limits& first, const Limits& second) noexcept
+		{
+			return std::tie(first.top, first.right, first.bottom, first.left) ==
+				std::tie(second.top, second.right, second.bottom, second.left);
+		}
+
+		auto& operator+=(const Position& pos) noexcept
+		{
+			top += pos.y, right += pos.x, bottom += pos.y, left += pos.x;
+			return *this;
+		}
+
+		[[nodiscard]] friend auto operator+(Limits l, const Position& pos) noexcept
+		{
+			return l += pos;
+		}
+	};
+
+	enum class WordOrientation : bool
+	{
+		VERTICAL,
+		HORIZONTAL
+	};
+
+	struct WordParams final
+	{
+		Utils::Position start;
+		WordOrientation orientation;
+
+		[[nodiscard]] friend auto operator==(const WordParams& first, const WordParams& second) noexcept
+		{
+			return std::tie(first.orientation, first.start) == std::tie(second.orientation, second.start);
+		}
+
+		auto& operator+=(const Position& pos) noexcept
+		{
+			start += pos;
+			return *this;
+		}
+
+		[[nodiscard]] friend auto operator+(WordParams lhs, const Position& rhs) noexcept
+		{
+			return lhs += rhs;
+		}
+	};
+
+	struct insertionParams final
+	{
+		insertionParams(const WordParams& params, const Limits& limits, std::size_t n) noexcept :
+			wordParams{ params }, limits{ limits }, crosswordIntersectionNumber{ n }{}
+		WordParams wordParams;
+		Limits limits;
+		std::size_t crosswordIntersectionNumber;
+
+		[[nodiscard]] friend auto operator==(const insertionParams& first, const insertionParams& second) noexcept
+		{
+			return std::tie(first.wordParams, first.limits, first.crosswordIntersectionNumber) ==
+				std::tie(second.wordParams, second.limits, second.crosswordIntersectionNumber);
+		}
+
+		[[nodiscard]] friend auto operator+(insertionParams lhs, const Position& rhs) noexcept
+		{
+			lhs.wordParams += rhs, lhs.limits += rhs;
+			return lhs;
+		}
+	};
+
+	template<typename T>
+	void toUpper(T begin, T end)
+	{
+		for (auto it = begin; it != end; ++it) for (auto& ch : *it) ch = std::toupper(ch);
+	}
+
+	auto inline toUpper(std::vector<std::string> inp)
+	{
+		for (auto& word : inp) for (auto& ch : word) ch = std::toupper(ch);
+		return inp;
+	}
+}
