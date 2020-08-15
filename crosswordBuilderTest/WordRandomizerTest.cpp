@@ -56,7 +56,7 @@ TEST(WordRandomizerTest, DISABLED_shuffleNFirstWords)
 	static constexpr std::size_t TEST_COUNT = 5000;
 	for (std::size_t i = 0; i < TEST_COUNT; ++i)
 	{
-		WordRandomizer::shuffleNFirstWords(inp, SIZE);
+		WordRandomizer::shuffleNFirstWords(inp.begin(), std::next(inp.begin(), SIZE), inp.end());
 		++counter[{inp[0], inp[1]}];
 		
 	}
@@ -109,12 +109,6 @@ TEST(WordRandomizerTest, getRandomWordsUniqness)
 			words.insert(word);
 		}
 	}
-}
-
-TEST(WordRandomizerTest, shuffleNFirstWordsException)
-{
-	std::vector<std::string> inp = { "AA", "BB" };
-	testException([&inp]() {WordRandomizer::shuffleNFirstWords(inp, 2); }, "The output words' number should be more or equal to the input words' number minus one");
 }
 
 TEST(WordRandomizerTest, getRandomWordsException)

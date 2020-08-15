@@ -42,4 +42,10 @@ TEST(UtilsTest, isPossibileToIntersect)
 	ASSERT_TRUE(isPossibileToIntersect(toUpper({ "albatross", "biddy", "blackbird", "canary", "crow" })));
 }
 
-//TODO add new tests (exceptions, out of borders)
+TEST(Utils, findGroupWithSizeN)
+{
+	auto res = Utils::findGroupWithSizeN({ "PAINTER", "FULL", "DEMAND", "TOWARD", "CARE", "SORE", "PLACE", "LAST", "DESPITE",
+			"FOOT", "MUSEUM", "ACROSS", "DOCUMENT", "WITHIN", "ANSWER", "WHETHER", "SUCK", "VIEW", "SAD", "DEFINITION",
+			"VALUE", "CRUSH", "FIGURE", "HOLD", "NEARBY", "GUARD", "MIGHT", "LUCKY", "HUGE", "OFFENSE"}, 5);
+	ASSERT_TRUE(res);
+}

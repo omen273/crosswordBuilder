@@ -10,7 +10,7 @@
 using namespace Utils;
 
 Crossword::Crossword(const crosswordString& firstWord, bool removeTouchesWithSameOrientation) :
-	removeTouchesWithSameOrientation{removeTouchesWithSameOrientation}
+		removeTouchesWithSameOrientation{removeTouchesWithSameOrientation}
 {
 	if (firstWord.size() < 2) [[unlikely]] throw std::runtime_error{ "A word's size should be greater or equal two." };
 	const auto start = getCoordinateStart();
@@ -31,7 +31,7 @@ Crossword::Crossword(const crosswordString& firstWord, bool removeTouchesWithSam
 }
 
 std::optional<std::size_t> Crossword::canBeInserted(const WordParams& params, const crosswordString& word) const noexcept
-{	
+{
 	auto fromWordToCellOrientation = [](WordOrientation o)
 	{
 		return o == WordOrientation::HORIZONTAL ? CellOrientation::HORIZONTAL : CellOrientation::VERTICAL;
@@ -44,10 +44,10 @@ std::optional<std::size_t> Crossword::canBeInserted(const WordParams& params, co
 
 		const auto& startPos = params.start;
 		const auto& endPos = Position{params.start.x + static_cast<int>(word.size()) - 1, params.start.y };
-		const auto isLeftContact = startPos.x > 0 ? 
-			board[startPos.y][static_cast<std::size_t>(startPos.x) - 1].orientation() != CellOrientation::NONE : false;
-		const auto isRightContact = endPos.x + 1 < static_cast<int>(board[0].size()) ? 
-			board[endPos.y][static_cast<std::size_t>(endPos.x) + 1].orientation() != CellOrientation::NONE : false;
+		const auto isLeftContact = startPos.x > 0 ?
+								   board[startPos.y][static_cast<std::size_t>(startPos.x) - 1].orientation() != CellOrientation::NONE : false;
+		const auto isRightContact = endPos.x + 1 < static_cast<int>(board[0].size()) ?
+									board[endPos.y][static_cast<std::size_t>(endPos.x) + 1].orientation() != CellOrientation::NONE : false;
 		if (isLeftContact || isRightContact) return std::nullopt;
 
 		for ( auto i = 0; i < word.size(); ++i)
@@ -57,13 +57,13 @@ std::optional<std::size_t> Crossword::canBeInserted(const WordParams& params, co
 
 				auto x = params.start.x + i, y = params.start.y;
 				const auto isDownContact = y + 1 < static_cast<int>(board.size()) ?
-					(board[y + 1][x].isVerticalBegin() && (board[y + 1][x].orientation() == CellOrientation::VERTICAL
-					|| board[y + 1][x].orientation() == CellOrientation::TWO)) ||
-						(removeTouchesWithSameOrientation && board[y + 1][x].orientation() == CellOrientation::HORIZONTAL) : false;
+										   (board[y + 1][x].isVerticalBegin() && (board[y + 1][x].orientation() == CellOrientation::VERTICAL
+																				  || board[y + 1][x].orientation() == CellOrientation::TWO)) ||
+										   (removeTouchesWithSameOrientation && board[y + 1][x].orientation() == CellOrientation::HORIZONTAL) : false;
 				const auto isUpContact = y > 0 ?
-					(board[y - 1][x].isVerticalEnd() && (board[y - 1][x].orientation() == CellOrientation::VERTICAL
-					|| board[y - 1][x].orientation() == CellOrientation::TWO)) ||
-						(removeTouchesWithSameOrientation && board[y - 1][x].orientation() == CellOrientation::HORIZONTAL) : false;
+										 (board[y - 1][x].isVerticalEnd() && (board[y - 1][x].orientation() == CellOrientation::VERTICAL
+																			  || board[y - 1][x].orientation() == CellOrientation::TWO)) ||
+										 (removeTouchesWithSameOrientation && board[y - 1][x].orientation() == CellOrientation::HORIZONTAL) : false;
 				return isDownContact || isUpContact;
 
 			};
@@ -83,11 +83,11 @@ std::optional<std::size_t> Crossword::canBeInserted(const WordParams& params, co
 
 		const auto& startPos = params.start;
 		const auto& endPos = Position{params.start.x, params.start.y + static_cast<int>(word.size()) - 1 };
-		const auto isUpContact = startPos.y > 0 ? 
-			board[static_cast<std::size_t>(startPos.y) - 1][startPos.x].orientation() != CellOrientation::NONE : false;
+		const auto isUpContact = startPos.y > 0 ?
+								 board[static_cast<std::size_t>(startPos.y) - 1][startPos.x].orientation() != CellOrientation::NONE : false;
 		const auto isDownContact = endPos.y + 1 < static_cast<int>(board.size())
-			? board[static_cast<std::size_t>(endPos.y) + 1][endPos.x].orientation()
-			!= CellOrientation::NONE : false;
+								   ? board[static_cast<std::size_t>(endPos.y) + 1][endPos.x].orientation()
+									 != CellOrientation::NONE : false;
 		if (isUpContact || isDownContact) return std::nullopt;
 
 		for (auto i = 0; i < word.size(); ++i)
@@ -97,17 +97,17 @@ std::optional<std::size_t> Crossword::canBeInserted(const WordParams& params, co
 			{
 				auto x = params.start.x, y = params.start.y + i;
 				const auto isRightContact = x + 1 < static_cast<int>(board[y].size()) ?
-					(board[y][x + 1].isHorizontalBegin() && (board[y][x + 1].orientation() == CellOrientation::HORIZONTAL ||
-					board[y][x + 1].orientation() == CellOrientation::TWO)) ||
-						(removeTouchesWithSameOrientation && board[y][x + 1].orientation() == CellOrientation::VERTICAL) : false;
+											(board[y][x + 1].isHorizontalBegin() && (board[y][x + 1].orientation() == CellOrientation::HORIZONTAL ||
+																					 board[y][x + 1].orientation() == CellOrientation::TWO)) ||
+											(removeTouchesWithSameOrientation && board[y][x + 1].orientation() == CellOrientation::VERTICAL) : false;
 				const auto isLeftContact = x > 0 ?
-					(board[y][x - 1].isHorizontalEnd() && (board[y][x - 1].orientation() == CellOrientation::HORIZONTAL ||
-					board[y][x - 1].orientation() == CellOrientation::TWO)) ||
-						(removeTouchesWithSameOrientation && board[y][x - 1].orientation() == CellOrientation::VERTICAL) : false;
+										   (board[y][x - 1].isHorizontalEnd() && (board[y][x - 1].orientation() == CellOrientation::HORIZONTAL ||
+																				  board[y][x - 1].orientation() == CellOrientation::TWO)) ||
+										   (removeTouchesWithSameOrientation && board[y][x - 1].orientation() == CellOrientation::VERTICAL) : false;
 				return isRightContact || isLeftContact;
 			};
 
-			if (cell.orientation() == CellOrientation::TWO || 
+			if (cell.orientation() == CellOrientation::TWO ||
 				(cell.orientation() != CellOrientation::NONE && cell.letter() != word[i]) ||
 				cell.orientation() == fromWordToCellOrientation(params.orientation) || areTouches())
 			{
@@ -141,12 +141,12 @@ std::vector<Utils::insertionParams> Crossword::testWord(const crosswordString& w
 		for (const auto intersection : intersections)
 		{
 			const auto wordParams = param.orientation == WordOrientation::HORIZONTAL ?
-				WordParams{ param.start + 
-				Position{ static_cast<int>(intersection.firstWordPos), -static_cast<int>(intersection.secondWordPos) }, 
-				WordOrientation::VERTICAL } :
-				WordParams{ param.start + 
-				Position{ -static_cast<int>(intersection.secondWordPos), static_cast<int>(intersection.firstWordPos) }, 
-				WordOrientation::HORIZONTAL };
+									WordParams{ param.start +
+												Position{ static_cast<int>(intersection.firstWordPos), -static_cast<int>(intersection.secondWordPos) },
+												WordOrientation::VERTICAL } :
+									WordParams{ param.start +
+												Position{ -static_cast<int>(intersection.secondWordPos), static_cast<int>(intersection.firstWordPos) },
+												WordOrientation::HORIZONTAL };
 			if (!positions.contains(wordParams.start))
 			{
 				positions.insert(wordParams.start);
@@ -166,7 +166,7 @@ bool Crossword::outsideBorders(const WordParams& wordParams, std::size_t size) c
 {
 	const auto newLimits = limitKeeper.tryLimits(wordParams, size);
 	return newLimits.top < 0 || newLimits.bottom > MAX_CROSSWORD_HEIGHT ||
-		newLimits.left < 0 || newLimits.right > MAX_CROSSWORD_WIDTH;
+		   newLimits.left < 0 || newLimits.right > MAX_CROSSWORD_WIDTH;
 }
 
 void Crossword::insertWord(const crosswordString& word, const WordParams& wordParams)
@@ -256,14 +256,12 @@ Position Crossword::getCoordinateStart() const noexcept
 	return { X, Y};
 }
 
-std::vector < crosswordString> Crossword::getCrossword() const
+CrosswordParams Crossword::getCrossword() const
 {
 	const auto limits = limitKeeper.getLimits();
-	std::vector<crosswordString> res(limits.bottom - limits.top, 
-		crosswordString(limits.right - limits.left, ' '));
-	for (int i = limits.top; i < limits.bottom; ++i)
-	{
-		for (int j = limits.left; j < limits.right; ++j) res[i - limits.top][j - limits.left] = board[i][j].letter();
-	}
+	CrosswordParams res{std::vector<Word>(words.size()), static_cast<size_t>(limits.right - limits.left),
+	        static_cast<size_t>(limits.bottom - limits.top)};
+	std::transform(words.begin(), words.end(), res.words.begin(),
+			[&limits](const auto& p){return Word{p.first, p.second - Position{limits.left, limits.top}};});
 	return res;
 }

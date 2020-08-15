@@ -27,10 +27,23 @@ using crosswordString = std::basic_string<crosswordChar>;
 //			the first word "word" was inserted into width/2, height/2 position in the constructor,
 //			you can use it as (0, 0) of your own axis with help of getCoordinateStart()
 
+struct Word
+{
+	crosswordString  word;
+	Utils::WordParams params;
+};
+
+struct CrosswordParams
+{
+	std::vector<Word> words;
+	std::size_t width;
+	std::size_t height;
+};
+
 class Crossword final
 {
 public:
-	explicit Crossword(const crosswordString& firstWord, bool removeTouchesWithSameOrientation = true); 
+	explicit Crossword(const crosswordString& firstWord, bool removeTouchesWithSameOrientation = true);
 	[[nodiscard]]  std::vector<Utils::insertionParams> testWord(const crosswordString& word) const;
 	//This method doesn't check a word's insertion in other words' cells
 	void insertWord(const crosswordString& word, const Utils::WordParams& wordParam);
@@ -38,7 +51,7 @@ public:
 	[[nodiscard]]  Utils::Position getCoordinateStart() const noexcept;
 	[[nodiscard]]  auto getLetterCount() const noexcept{ return letterN; }
 	[[nodiscard]] auto getWordCount() const noexcept { return words.size(); }
-	[[nodiscard]] std::vector < crosswordString> getCrossword() const;
+	[[nodiscard]] CrosswordParams getCrossword() const;
 
 private:
 	[[nodiscard]] std::optional<std::size_t> canBeInserted(const Utils::WordParams& params, const crosswordString& word) const noexcept;

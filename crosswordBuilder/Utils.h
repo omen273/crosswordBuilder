@@ -2,6 +2,7 @@
 #include <array>
 #include <compare>
 #include <queue>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -17,7 +18,7 @@ namespace Utils
 		std::size_t firstWordPos;
 		std::size_t secondWordPos;
 
-		[[nodiscard]] auto operator<=>(const Intersection&) const = default;
+		[[nodiscard]] auto operator<=> (const Intersection&) const = default;
 	};
 
 	//works only for Latin big letters
@@ -45,36 +46,59 @@ namespace Utils
 		}
 	};
 
-	[[nodiscard]] auto inline isPossibileToIntersect(const std::vector<std::string>& words)
+	[[nodiscard]] std::optional<std::vector<std::string>> inline findGroupWithSizeN(const std::vector<std::string>& words, std::size_t n)
 	{
-		if (words.size() < 2) [[unlikely]] throw std::runtime_error{ "Input consists less than two words." };
-		std::queue < std::pair<std::size_t, std::vector<std::size_t>>> q;
-		std::vector<std::size_t> firstWordIntersections;
-		for (std::size_t i = 1; i < words.size(); ++i)
+		auto visit = [](const auto& words, std::size_t n)
 		{
-			if (!findIntersections(words[0], words[i]).empty()) firstWordIntersections.push_back(i);
-		}
-		q.push({ 0 , std::move(firstWordIntersections) });
-		std::vector<std::size_t> visited(words.size());
-		while (!q.empty())
-		{
-			auto front = std::move(q.front());
-			q.pop();
-			visited[front.first] = true;
-			for (auto n : front.second)
+			std::queue<std::size_t> q;
+			q.push(0);
+			std::vector<std::size_t> visited(words.size());
+			std::size_t count = 1;
+			visited.front() = true;
+			while (!q.empty() && count < n)
 			{
-				std::vector<std::size_t> wordIntersections;
-				for (std::size_t i = 0; i < words.size(); ++i)
+				auto front = q.front();
+				q.pop();
+				for (std::size_t i = 0; i < words.size() && count < n ; ++i)
 				{
-					if (!visited[n] && !findIntersections(words[n], words[i]).empty())
+					if (i != front && !visited[i] && !findIntersections(words[front], words[i]).empty())
 					{
-						wordIntersections.push_back(i);
+						q.push(i);
+						visited[i] = true;
+						++count;
 					}
 				}
-				if (!wordIntersections.empty()) q.push({ n, std::move(wordIntersections) });
 			}
-		}
-		return std::all_of(visited.begin(), visited.end(), [](auto is) {return is; });
+			return std::pair(count == n, visited);
+		};
+
+		std::vector<std::string> nonIntersected{words};
+		do{
+			auto visited = visit(nonIntersected, n);
+			if (visited.first)
+			{
+				std::vector<std::string> res;
+				res.reserve(n);
+				for (std::size_t i = 0; i < nonIntersected.size(); ++i)
+				{
+					if(visited.second[i]) res.push_back(nonIntersected[i]);
+				}
+				return res;
+			}
+			std::vector<std::string> newNonIntersected;
+			for(std::size_t i = 0; i < nonIntersected.size(); ++i)
+			{
+				if (!visited.second[i]) newNonIntersected.push_back(nonIntersected[i]);
+			}
+			nonIntersected = std::move(newNonIntersected);
+		}while(nonIntersected.size() >= n);
+
+		return std::nullopt;
+	}
+	
+	[[nodiscard]] auto inline isPossibileToIntersect(const std::vector<std::string>& words)
+	{
+		return findGroupWithSizeN(words, words.size());
 	}
 
 	struct Position final
@@ -88,12 +112,31 @@ namespace Utils
 			return *this;
 		}
 
+		auto& operator-=(const Position& pos) noexcept
+		{
+			x -= pos.x, y -= pos.y;
+			return *this;
+		}
+
 		[[nodiscard]] friend auto operator+(Position first, const Position& second) noexcept
 		{
 			return first += second;
 		}
 
-		[[nodiscard]] auto operator<=>(const Position&) const = default;
+		[[nodiscard]] friend auto operator-(Position first, const Position& second) noexcept
+		{
+			return first -= second;
+		}
+
+		[[nodiscard]] friend auto operator==(const Position& first, const Position& second) noexcept
+		{
+			return std::tie(first.x, first.y) == std::tie(second.x, second.y);
+		}
+
+		[[nodiscard]] friend auto operator<(const Position& first, const Position& second) noexcept
+		{
+			return std::tie(first.x, first.y) < std::tie(second.x, second.y);
+		}
 	};
 
 	struct positionHash final
@@ -153,10 +196,23 @@ namespace Utils
 			return *this;
 		}
 
+		auto& operator-=(const Position& pos) noexcept
+		{
+			start -= pos;
+			return *this;
+		}
+
 		[[nodiscard]] friend auto operator+(WordParams lhs, const Position& rhs) noexcept
 		{
 			return lhs += rhs;
 		}
+
+		[[nodiscard]] friend auto operator-(WordParams lhs, const Position& rhs) noexcept
+		{
+			return lhs -= rhs;
+		}
+
+
 	};
 
 	struct insertionParams final

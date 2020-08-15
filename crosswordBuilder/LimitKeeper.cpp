@@ -7,20 +7,20 @@ using namespace Utils;
 
 Limits LimitKeeper::getLimits() const noexcept
 {
-	return { static_cast<int>(tops.empty() ? 0 : tops.begin()->first),
-		static_cast<int>(rights.empty() ? 0 : std::prev(rights.end())->first),
-		static_cast<int>(bottoms.empty() ? 0 : std::prev(bottoms.end())->first),
-		static_cast<int>(lefts.empty() ? 0 : lefts.begin()->first) };
+	return { tops.empty() ? 0 : tops.begin()->first,
+		rights.empty() ? 0 : std::prev(rights.end())->first,
+		bottoms.empty() ? 0 : std::prev(bottoms.end())->first,
+		lefts.empty() ? 0 : lefts.begin()->first};
 }
 
 Limits LimitKeeper::tryLimits(const WordParams& params, std::size_t size) const noexcept
 {
 	auto tryL = [&, this](int right, int bottom)
 	{
-		return Limits{ std::min(static_cast<int>(tops.empty() ? 0 : tops.begin()->first), params.start.y),
-			std::max(static_cast<int>(rights.empty() ? 0 : std::prev(rights.end())->first), right),
-			std::max(static_cast<int>(bottoms.empty() ? 0 : std::prev(bottoms.end())->first), bottom),
-			std::min(static_cast<int>(lefts.empty() ? 0 : lefts.begin()->first), params.start.x) };
+		return Limits{ std::min(tops.empty() ? 0 : tops.begin()->first, params.start.y),
+			std::max(rights.empty() ? 0 : std::prev(rights.end())->first, right),
+			std::max(bottoms.empty() ? 0 : std::prev(bottoms.end())->first, bottom),
+			std::min(lefts.empty() ? 0 : lefts.begin()->first, params.start.x) };
 	};
 	auto size_ = static_cast<int>(size);
 	return params.orientation == WordOrientation::HORIZONTAL ? tryL(params.start.x + size_, params.start.y + 1)
