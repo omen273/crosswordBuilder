@@ -53,8 +53,7 @@ namespace Utils
         using It = std::vector<std::string>::iterator;
         auto visit = [](It start, It n, It end)
         {
-            auto current = start;
-            auto last = std::next(start);
+            auto current = start, last = std::next(start);
             while (last != n)
             {
                 for (auto it = last; last != n && it != end; ++it)
@@ -69,7 +68,7 @@ namespace Utils
         auto start = begin;
         while(std::distance(start, end) >= n)
         {
-            auto last = std::next(start, std::min(n, static_cast<std::size_t>(std::distance(start, end))));
+            auto last = std::next(start, n);
             last = visit(start, last, end);
             if (std::distance(start, last) == n) return std::vector<std::string>{ start, last };
             start = last;
