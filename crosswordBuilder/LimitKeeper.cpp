@@ -27,6 +27,13 @@ Limits LimitKeeper::tryLimits(const WordParams& params, std::size_t size) const 
         : tryL(params.start.x + 1, params.start.y + size_);
 }
 
+void LimitKeeper::apply(const std::function<void(int, int)>& f, const WordParams& params, std::size_t size)
+{
+    auto size_ = static_cast<int>(size);
+    if (params.orientation == WordOrientation::HORIZONTAL) f(params.start.x + size_, params.start.y + 1);
+    else f(params.start.x + 1, params.start.y + size_);
+}
+
 void LimitKeeper::addWord(const WordParams& params, std::size_t size) noexcept
 {
     auto add = [&, this](int right, int bottom)
@@ -42,9 +49,7 @@ void LimitKeeper::addWord(const WordParams& params, std::size_t size) noexcept
         if (auto it = lefts.find(left); it == lefts.end()) lefts.emplace(left, 1);
         else ++it->second;
     };
-    auto size_ = static_cast<int>(size);
-    if (params.orientation == WordOrientation::HORIZONTAL) add(params.start.x + size_, params.start.y + 1);
-    else add(params.start.x + 1, params.start.y + size_);
+    apply(add, params, size);
 }
 
 void LimitKeeper::removeWord(const Utils::WordParams& params, std::size_t size)
@@ -60,7 +65,5 @@ void LimitKeeper::removeWord(const Utils::WordParams& params, std::size_t size)
         for (auto& [it, m, message] : params) if (it == m.end()) [[unlikely]] throw std::runtime_error{ message };
         for (auto& [it, m, message] : params) if (!--it->second) m.erase(it);
     };
-    auto size_ = static_cast<int>(size);
-    if (params.orientation == WordOrientation::HORIZONTAL) remove(params.start.x + size_, params.start.y + 1);
-    else remove(params.start.x + 1, params.start.y + size_);
+    apply(remove, params, size);
 }

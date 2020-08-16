@@ -46,7 +46,7 @@ namespace Utils
         }
     };
 
-    [[nodiscard]] std::optional<std::vector<std::string>> inline findGroupWithSizeN(const std::vector<std::string>& words, std::size_t n)
+    [[nodiscard]] std::optional<std::vector<std::string>> inline findGroupWithSizeN(std::vector<std::string> nonIntersected, std::size_t n)
     {
         auto visit = [](const auto& words, std::size_t n)
         {
@@ -72,7 +72,6 @@ namespace Utils
             return std::pair(count == n, visited);
         };
 
-        std::vector<std::string> nonIntersected{ words };
         do {
             auto visited = visit(nonIntersected, n);
             if (visited.first)

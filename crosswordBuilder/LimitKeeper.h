@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <map>
 
 #include "Utils.h"
@@ -13,6 +14,7 @@ public:
     void removeWord(const Utils::WordParams& params, std::size_t size);
 
 private:
+    void apply(const std::function<void(int, int)>& f, const Utils::WordParams& params, std::size_t size);
     using limitMap = std::map<int, std::size_t>;
     limitMap tops;
     limitMap rights;

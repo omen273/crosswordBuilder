@@ -134,7 +134,7 @@ std::optional<Crossword> CrosswordBuilder::build(std::vector<std::string>& words
         throw std::runtime_error{ "The input consists of too long words." };
     }
     for (auto itLastPrev = words.begin(), itLast = next(words.begin(), wordCount); itLastPrev != words.end(); itLastPrev = itLast,
-        itLast = std::next(itLast, std::min(distance(words.begin(), itLast), std::distance(itLast, words.end()))))
+        itLast += std::min(distance(words.begin(), itLast), std::distance(itLast, words.end())))
     {
         WordRandomizer::shuffleNFirstWords(itLastPrev, itLast, words.end());
         Utils::toUpper(itLastPrev, itLast);
