@@ -13,8 +13,9 @@ public:
     void removeWord(const Utils::WordParams& params, std::size_t size);
 
 private:
-    std::map<int, std::size_t> tops;
-    std::map<int, std::size_t> rights;
-    std::map<int, std::size_t> bottoms;
-    std::map<int, std::size_t> lefts;
+    using limitMap = std::map<int, std::size_t>;
+    limitMap tops;
+    limitMap rights;
+    limitMap bottoms;
+    limitMap lefts;
 };

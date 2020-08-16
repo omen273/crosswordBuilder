@@ -4,7 +4,18 @@
 
 #include <algorithm>
 
+#include "testUtils.h"
+
 using namespace Utils;
+using namespace testUtils;
+
+namespace
+{
+    [[nodiscard]] auto isPossibileToIntersect(const std::vector<std::string>& words)
+    {
+        return findGroupWithSizeN(words, words.size());
+    }
+}
 
 TEST(UtilsTest, findIntersections)
 {
@@ -28,7 +39,7 @@ TEST(UtilsTest, findIntersections)
     ASSERT_EQ(res1, res2);
 }
 
-TEST(UtilsTest, isPossibileToIntersect)
+TEST(UtilsTest, findGroupWithSizeN)
 {
     ASSERT_FALSE(isPossibileToIntersect(toUpper({ "veldt", "jynx", "grimps", "wrqf", "zho", "aaa" })));
     ASSERT_FALSE(isPossibileToIntersect(toUpper({ "yak", "owl" })));

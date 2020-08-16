@@ -141,7 +141,7 @@ std::optional<Crossword> CrosswordBuilder::build(std::vector<std::string>& words
         if (auto res = findGroupWithSizeN({ words.begin(), itLast }, wordCount); res) return ::build(res.value(), maxSideSize, maxCalculationTime);
 
     }
-    std::string s{ "Impossible to build a crossword which consists of" };
+    std::string s{ "Impossible to build a crossword which consists of " };
     s += std::to_string(wordCount) += " words from this.";
     throw std::runtime_error{ s };
 }

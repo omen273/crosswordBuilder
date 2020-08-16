@@ -96,11 +96,6 @@ namespace Utils
         return std::nullopt;
     }
 
-    [[nodiscard]] auto inline isPossibileToIntersect(const std::vector<std::string>& words)
-    {
-        return findGroupWithSizeN(words, words.size());
-    }
-
     struct Position final
     {
         int x;
@@ -240,11 +235,5 @@ namespace Utils
     void toUpper(T begin, T end)
     {
         for (auto it = begin; it != end; ++it) for (auto& ch : *it) ch = std::toupper(ch);
-    }
-
-    auto inline toUpper(std::vector<std::string> inp)
-    {
-        for (auto& word : inp) for (auto& ch : word) ch = std::toupper(ch);
-        return inp;
     }
 }

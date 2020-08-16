@@ -9,6 +9,7 @@
 #include "testUtils.h"
 
 using namespace Utils;
+using namespace testUtils;
 using namespace std::chrono_literals;
 
 TEST(crosswordBuilderTest, buildTest)

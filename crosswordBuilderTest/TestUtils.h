@@ -22,4 +22,10 @@ namespace testUtils
         };
         ASSERT_THROW(test(f, exceptionText), std::runtime_error);
     }
+
+    auto inline toUpper(std::vector<std::string> inp)
+    {
+        for (auto& word : inp) for (auto& ch : word) ch = std::toupper(ch);
+        return inp;
+    }
 }
