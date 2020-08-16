@@ -46,51 +46,33 @@ namespace Utils
         }
     };
 
-    [[nodiscard]] std::optional<std::vector<std::string>> inline findGroupWithSizeN(std::vector<std::string> nonIntersected, std::size_t n)
+
+    [[nodiscard]] std::optional<std::vector<std::string>> inline findGroupWithSizeN(std::vector<std::string> words, std::size_t n)
     {
-        auto visit = [](const auto& words, std::size_t n)
+        using It = std::vector<std::string>::iterator;
+        auto visit = [](It start, It n, It end)
         {
-            std::queue<std::size_t> q;
-            q.push(0);
-            std::vector<std::size_t> visited(words.size());
-            std::size_t count = 1;
-            visited.front() = true;
-            while (!q.empty() && count < n)
+            auto current = start;
+            auto last = std::next(start);
+            while (last != n)
             {
-                auto front = q.front();
-                q.pop();
-                for (std::size_t i = 0; i < words.size() && count < n; ++i)
+                for (auto it = last; last != n && it != end; ++it)
                 {
-                    if (i != front && !visited[i] && !findIntersections(words[front], words[i]).empty())
-                    {
-                        q.push(i);
-                        visited[i] = true;
-                        ++count;
-                    }
+                    if (!findIntersections(*current, *it).empty())  std::iter_swap(last++, it);
                 }
+                if (++current == last) break;
             }
-            return std::pair(count == n, visited);
+            return last;
         };
 
-        do {
-            auto visited = visit(nonIntersected, n);
-            if (visited.first)
-            {
-                std::vector<std::string> res;
-                res.reserve(n);
-                for (std::size_t i = 0; i < nonIntersected.size(); ++i)
-                {
-                    if (visited.second[i]) res.push_back(nonIntersected[i]);
-                }
-                return res;
-            }
-            std::vector<std::string> newNonIntersected;
-            for (std::size_t i = 0; i < nonIntersected.size(); ++i)
-            {
-                if (!visited.second[i]) newNonIntersected.push_back(nonIntersected[i]);
-            }
-            nonIntersected = std::move(newNonIntersected);
-        } while (nonIntersected.size() >= n);
+        auto start = words.begin();
+        while(std::distance(start, words.end()) >= n)
+        {
+            auto last = std::next(start, std::min(n, static_cast<std::size_t>(std::distance(start, words.end()))));
+            last = visit(start, last, words.end());
+            if (std::distance(start, last) == n) return std::vector<std::string>{ start, last };
+            start = last;
+        }
 
         return std::nullopt;
     }
