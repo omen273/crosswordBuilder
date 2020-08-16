@@ -11,9 +11,9 @@ using namespace testUtils;
 
 namespace
 {
-    [[nodiscard]] auto isPossibileToIntersect(const std::vector<std::string>& words)
+    [[nodiscard]] auto isPossibileToIntersect(std::vector<std::string> words)
     {
-        return findGroupWithSizeN(words, words.size());
+        return findGroupWithSizeN(words.begin(), words.end(), words.size());
     }
 }
 
@@ -55,8 +55,9 @@ TEST(UtilsTest, findGroupWithSizeN)
 
 TEST(Utils, findGroupWithSizeN)
 {
-    auto res = Utils::findGroupWithSizeN({ "PAINTER", "FULL", "DEMAND", "TOWARD", "CARE", "SORE", "PLACE", "LAST", "DESPITE",
+    std::vector<std::string> v{ "PAINTER", "FULL", "DEMAND", "TOWARD", "CARE", "SORE", "PLACE", "LAST", "DESPITE",
             "FOOT", "MUSEUM", "ACROSS", "DOCUMENT", "WITHIN", "ANSWER", "WHETHER", "SUCK", "VIEW", "SAD", "DEFINITION",
-            "VALUE", "CRUSH", "FIGURE", "HOLD", "NEARBY", "GUARD", "MIGHT", "LUCKY", "HUGE", "OFFENSE" }, 5);
+            "VALUE", "CRUSH", "FIGURE", "HOLD", "NEARBY", "GUARD", "MIGHT", "LUCKY", "HUGE", "OFFENSE" };
+    auto res = Utils::findGroupWithSizeN(v.begin(), v.end(), 5);
     ASSERT_TRUE(res);
 }

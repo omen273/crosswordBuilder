@@ -138,7 +138,7 @@ std::optional<Crossword> CrosswordBuilder::build(std::vector<std::string>& words
     {
         WordRandomizer::shuffleNFirstWords(itLastPrev, itLast, words.end());
         Utils::toUpper(itLastPrev, itLast);
-        if (auto res = findGroupWithSizeN({ words.begin(), itLast }, wordCount); res) return ::build(res.value(), maxSideSize, maxCalculationTime);
+        if (auto res = findGroupWithSizeN(words.begin(), itLast, wordCount); res) return ::build(res.value(), maxSideSize, maxCalculationTime);
 
     }
     std::string s{ "Impossible to build a crossword which consists of " };

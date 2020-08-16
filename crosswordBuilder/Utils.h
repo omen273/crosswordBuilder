@@ -47,7 +47,8 @@ namespace Utils
     };
 
 
-    [[nodiscard]] std::optional<std::vector<std::string>> inline findGroupWithSizeN(std::vector<std::string> words, std::size_t n)
+    [[nodiscard]] std::optional<std::vector<std::string>> inline findGroupWithSizeN(std::vector<std::string>::iterator begin,
+        std::vector<std::string>::iterator end, std::size_t n)
     {
         using It = std::vector<std::string>::iterator;
         auto visit = [](It start, It n, It end)
@@ -65,11 +66,11 @@ namespace Utils
             return last;
         };
 
-        auto start = words.begin();
-        while(std::distance(start, words.end()) >= n)
+        auto start = begin;
+        while(std::distance(start, end) >= n)
         {
-            auto last = std::next(start, std::min(n, static_cast<std::size_t>(std::distance(start, words.end()))));
-            last = visit(start, last, words.end());
+            auto last = std::next(start, std::min(n, static_cast<std::size_t>(std::distance(start, end))));
+            last = visit(start, last, end);
             if (std::distance(start, last) == n) return std::vector<std::string>{ start, last };
             start = last;
         }
