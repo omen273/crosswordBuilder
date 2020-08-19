@@ -182,6 +182,14 @@ void Crossword::insertWord(const crosswordString& word, const WordParams& wordPa
             if (cell.orientation() == CellOrientation::VERTICAL && cell.letter() == word[i]) ++intersectionCount;
             else if (cell.orientation() != CellOrientation::NONE) throw std::runtime_error{ "There is another non-intersectable word in this position." };
         }
+
+        for (std::size_t i = 0; i < word.size(); ++i)
+        {
+            auto& cell = board[wordParams.start.y][static_cast<std::size_t>(wordParams.start.x) + i];
+            cell.addHorizontalInsideLetter(word[i]);
+        }
+        board[wordParams.start.y][wordParams.start.x].addHorizontalBeginLetter(word[0]);
+        board[wordParams.start.y][wordParams.start.x + word.size() - 1].addHorizontalEndLetter(word.back());
  
     }
     else
@@ -192,20 +200,7 @@ void Crossword::insertWord(const crosswordString& word, const WordParams& wordPa
             if (cell.orientation() == CellOrientation::HORIZONTAL && cell.letter() == word[i]) ++intersectionCount;
             else if (cell.orientation() != CellOrientation::NONE) throw std::runtime_error{ "There is another non-intersectable word in this position." };
         }
-    }
 
-    if (wordParams.orientation == WordOrientation::HORIZONTAL)
-    {
-        for (std::size_t i = 0; i < word.size(); ++i)
-        {
-            auto& cell = board[wordParams.start.y][static_cast<std::size_t>(wordParams.start.x) + i];
-            cell.addHorizontalInsideLetter(word[i]);
-        }
-        board[wordParams.start.y][wordParams.start.x].addHorizontalBeginLetter(word[0]);
-        board[wordParams.start.y][wordParams.start.x + word.size() - 1].addHorizontalEndLetter(word.back());
-    }
-    else
-    {
         for (std::size_t i = 0; i < word.size(); ++i)
         {
             auto& cell = board[static_cast<std::size_t>(wordParams.start.y) + i][wordParams.start.x];
