@@ -3,18 +3,16 @@
 #include <stdexcept>
 #include <unordered_set>
 
-#include "Constants.h"
-
 //TODO exception safe
 
 using namespace Utils;
 
-Crossword::Crossword(const crosswordString& firstWord, bool removeTouchesWithSameOrientation) :
-    removeTouchesWithSameOrientation{ removeTouchesWithSameOrientation }
+Crossword::Crossword(const crosswordString& firstWord, bool removeTouchesWithSameOrientation, std::size_t width, std::size_t height) :
+    removeTouchesWithSameOrientation{ removeTouchesWithSameOrientation }, width{width}, height{height}
 {
     if (firstWord.size() < 2) [[unlikely]] throw std::runtime_error{ "A word's size should be greater or equal two." };
     const auto start = getCoordinateStart();
-    board.resize(MAX_CROSSWORD_HEIGHT, std::vector<CrosswordCell>(MAX_CROSSWORD_WIDTH));
+    board.resize(height, std::vector<CrosswordCell>(width));
     const auto wordParams = WordParams{ start,  WordOrientation::HORIZONTAL };
     if (outsideBorders(wordParams, firstWord.size())) throw std::runtime_error{ "Out of the board." };
     words.emplace(firstWord, wordParams);
@@ -165,8 +163,8 @@ std::vector<Utils::insertionParams> Crossword::testWord(const crosswordString& w
 bool Crossword::outsideBorders(const WordParams& wordParams, std::size_t size) const
 {
     const auto newLimits = limitKeeper.tryLimits(wordParams, size);
-    return newLimits.top < 0 || newLimits.bottom > MAX_CROSSWORD_HEIGHT ||
-        newLimits.left < 0 || newLimits.right > MAX_CROSSWORD_WIDTH;
+    return newLimits.top < 0 || newLimits.bottom > width ||
+        newLimits.left < 0 || newLimits.right > height;
 }
 
 void Crossword::insertWord(const crosswordString& word, const WordParams& wordParams)
@@ -175,12 +173,32 @@ void Crossword::insertWord(const crosswordString& word, const WordParams& wordPa
     if (words.count(word)) [[unlikely]] throw std::runtime_error{ "The crossword consists of this word." };
     if (outsideBorders(wordParams, word.size())) throw std::runtime_error{ "Out of the board." };
 
+    auto intersectionCount = 0;
     if (wordParams.orientation == WordOrientation::HORIZONTAL)
     {
         for (std::size_t i = 0; i < word.size(); ++i)
         {
             auto& cell = board[wordParams.start.y][static_cast<std::size_t>(wordParams.start.x) + i];
-            if (cell.orientation() == CellOrientation::VERTICAL) ++intersectionN;
+            if (cell.orientation() == CellOrientation::VERTICAL && cell.letter() == word[i]) ++intersectionCount;
+            else if (cell.orientation() != CellOrientation::NONE) throw std::runtime_error{ "There is another non-intersectable word in this position." };
+        }
+ 
+    }
+    else
+    {
+        for (std::size_t i = 0; i < word.size(); ++i)
+        {
+            auto& cell = board[static_cast<std::size_t>(wordParams.start.y) + i][wordParams.start.x];
+            if (cell.orientation() == CellOrientation::HORIZONTAL && cell.letter() == word[i]) ++intersectionCount;
+            else if (cell.orientation() != CellOrientation::NONE) throw std::runtime_error{ "There is another non-intersectable word in this position." };
+        }
+    }
+
+    if (wordParams.orientation == WordOrientation::HORIZONTAL)
+    {
+        for (std::size_t i = 0; i < word.size(); ++i)
+        {
+            auto& cell = board[wordParams.start.y][static_cast<std::size_t>(wordParams.start.x) + i];
             cell.addHorizontalInsideLetter(word[i]);
         }
         board[wordParams.start.y][wordParams.start.x].addHorizontalBeginLetter(word[0]);
@@ -191,7 +209,6 @@ void Crossword::insertWord(const crosswordString& word, const WordParams& wordPa
         for (std::size_t i = 0; i < word.size(); ++i)
         {
             auto& cell = board[static_cast<std::size_t>(wordParams.start.y) + i][wordParams.start.x];
-            if (cell.orientation() == CellOrientation::HORIZONTAL) ++intersectionN;
             cell.addVerticalInsideLetter(word[i]);
         }
         board[wordParams.start.y][wordParams.start.x].addVerticalBeginLetter(word[0]);
@@ -202,12 +219,11 @@ void Crossword::insertWord(const crosswordString& word, const WordParams& wordPa
 
     limitKeeper.addWord(wordParams, word.size());
     letterN += word.size();
+    intersectionN += intersectionCount;
 }
 
 void Crossword::eraseWord(const crosswordString& word)
 {
-    if (word.size() < 2) [[unlikely]] throw std::runtime_error{ "A word's size should be greater or equal two." };
-
     const auto it = words.find(word);
     if (it == words.end()) [[unlikely]] throw std::runtime_error{ "The crossword doesn't consist of this word." };
 
@@ -216,14 +232,7 @@ void Crossword::eraseWord(const crosswordString& word)
     {
         for (std::size_t i = 0; i < word.size(); ++i)
         {
-            auto& cell = board[wordParams.start.y][static_cast<std::size_t>(wordParams.start.x) + i];
-            if (cell.letter() != word[i] ||
-                cell.orientation() == CellOrientation::VERTICAL ||
-                cell.orientation() == CellOrientation::NONE) [[unlikely]]
-            {
-                throw std::runtime_error{ "The crossword doesn't consist of this word in this position." };
-            }
-
+            auto& cell = board[wordParams.start.y][wordParams.start.x + i];
             if (cell.orientation() == CellOrientation::BOTH) --intersectionN;
             cell.removeHorizontalLetter();
         }
@@ -232,13 +241,7 @@ void Crossword::eraseWord(const crosswordString& word)
     {
         for (std::size_t i = 0; i < word.size(); ++i)
         {
-            auto& cell = board[static_cast<std::size_t>(wordParams.start.y) + i][wordParams.start.x];
-            if (cell.letter() != word[i] ||
-                cell.orientation() == CellOrientation::HORIZONTAL ||
-                cell.orientation() == CellOrientation::NONE) [[unlikely]]
-            {
-                throw std::runtime_error{ "The crossword doesn't consist of this word in this position." };
-            }
+            auto& cell = board[wordParams.start.y + i][wordParams.start.x];
 
             if (cell.orientation() == CellOrientation::BOTH) --intersectionN;
             cell.removeVerticalLetter();
@@ -252,8 +255,7 @@ void Crossword::eraseWord(const crosswordString& word)
 
 Position Crossword::getCoordinateStart() const noexcept
 {
-    static constexpr auto X = MAX_CROSSWORD_WIDTH / 2, Y = MAX_CROSSWORD_HEIGHT / 2;
-    return { X, Y };
+    return { static_cast<int>(height / 2), static_cast<int>(width / 2) };
 }
 
 CrosswordParams Crossword::getCrossword() const

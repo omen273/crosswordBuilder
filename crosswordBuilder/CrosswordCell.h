@@ -59,13 +59,13 @@ public:
 private:
     void addHorizontalLetter(crosswordChar letter, BordersType type) noexcept
     {
-        if (letter_ != letter) [[unlikely]] verticalBorder_ = BordersType::NONE;
+        if (letter_ != letter) verticalBorder_ = BordersType::NONE;
         letter_ = letter, horizontalBorder_ = type;
     }
 
     void addVerticalLetter(crosswordChar letter, BordersType type) noexcept
     {
-        if (letter_ != letter) [[unlikely]] horizontalBorder_ = BordersType::NONE;
+        if (letter_ != letter) horizontalBorder_ = BordersType::NONE;
         letter_ = letter, verticalBorder_ = type;
     }
 

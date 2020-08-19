@@ -153,7 +153,6 @@
     <ClCompile Include="WordRandomizer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Constants.h" />
     <ClInclude Include="Crossword.h" />
     <ClInclude Include="CrosswordBuilder.h" />
     <ClInclude Include="CrosswordCell.h" />

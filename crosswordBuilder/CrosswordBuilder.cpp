@@ -28,7 +28,8 @@ namespace
         std::random_device rd;
         std::mt19937 g(rd());
         std::shuffle(words.begin(), words.end(), g);
-        Crossword cross{ words[0] };
+        auto maxSize = 2 * limit;
+        Crossword cross{ words[0], true, maxSize, maxSize};
         size_t restartFromThisWordCount = 0;
         auto maxHeight = static_cast<int>(limit), maxWidth = static_cast<int>(limit);
         auto getNthBestPosition = [&cross, &words](auto& buildParams)

@@ -7,7 +7,6 @@
 
 #include "testUtils.h"
 #include "../crosswordBuilder/Utils.h"
-#include "../crosswordBuilder/Constants.h"
 
 using namespace Utils;
 using namespace testUtils;
@@ -105,8 +104,12 @@ TEST(CrosswordTest, eraseAbsentWord)
 {
     Crossword cross("SNAKE");
     testException([&cross]() {cross.eraseWord("RAT"); }, "The crossword doesn't consist of this word.");
-    insert("RAT", { {0,0}, WordOrientation::VERTICAL }, cross);
-    testException([&cross]() {cross.eraseWord("SNAKE"); }, "The crossword doesn't consist of this word in this position.");
+}
+
+TEST(CrosswordTest, insertWordInCellsOfAnotherWord)
+{
+    Crossword cross("SNAKE");
+    testException([&cross]() {insert("RAT", { {0,0}, WordOrientation::VERTICAL }, cross); }, "There is another non-intersectable word in this position.");
 }
 
 TEST(CrosswordTest, eraseWords)
@@ -147,12 +150,19 @@ TEST(CrosswordTest, InsertWordExceptioins)
     testException([]() {Crossword{ "WORD" }.insertWord("w", { {0,0}, WordOrientation::HORIZONTAL }); }, "A word's size should be greater or equal two.");
     testException([]() {Crossword{ "WORD" }.insertWord("", { {0, 0}, WordOrientation::HORIZONTAL }); }, "A word's size should be greater or equal two.");
     testException([]() {Crossword{ "SNAKE" }.insertWord("SNAKE", { {0,2}, WordOrientation::HORIZONTAL }); }, "The crossword consists of this word.");
-    testException([]() {Crossword{ "WORD" }.insertWord("OWL", { { MAX_CROSSWORD_WIDTH - 2, 0}, WordOrientation::HORIZONTAL }); }, "Out of the board.");
-    ASSERT_NO_THROW(Crossword{ "WORD" }.insertWord("OWL", { { MAX_CROSSWORD_WIDTH - 3, 0}, WordOrientation::HORIZONTAL }));
+    static constexpr std::size_t MAX_WIDTH = 29, MAX_HEIGHT = 27;
+    testException([]() {Crossword{ "WORD", true, MAX_WIDTH, MAX_HEIGHT }.insertWord("OWL", { { MAX_WIDTH - 2, 0}, WordOrientation::HORIZONTAL }); }, "Out of the board.");
+    {
+        auto f = []() {Crossword{ "WORD", true, MAX_WIDTH, MAX_HEIGHT }.insertWord("OWL", { { MAX_WIDTH - 3, 0}, WordOrientation::HORIZONTAL }); };
+        EXPECT_NO_THROW(f);
+    }
     testException([]() {Crossword{ "WORD" }.insertWord("OWL", { { -1, 0}, WordOrientation::HORIZONTAL }); }, "Out of the board.");
     ASSERT_NO_THROW(Crossword{ "WORD" }.insertWord("OWL", { { 0, 0}, WordOrientation::HORIZONTAL }));
-    testException([]() {Crossword{ "WORD" }.insertWord("OWL", { {0, MAX_CROSSWORD_HEIGHT - 2}, WordOrientation::VERTICAL }); }, "Out of the board.");
-    ASSERT_NO_THROW(Crossword{ "WORD" }.insertWord("OWL", { {0, MAX_CROSSWORD_HEIGHT - 3}, WordOrientation::VERTICAL }));
+    testException([]() {Crossword{ "WORD", true, MAX_WIDTH, MAX_HEIGHT }.insertWord("OWL", { {0, MAX_WIDTH - 2}, WordOrientation::VERTICAL }); }, "Out of the board.");
+    {
+        auto f = []() {Crossword{ "WORD", true, MAX_WIDTH, MAX_HEIGHT }.insertWord("OWL", { {0, MAX_HEIGHT - 3}, WordOrientation::VERTICAL }); };
+        EXPECT_NO_THROW(f);
+    }
     testException([]() {Crossword{ "WORD" }.insertWord("OWL", { {0, -1}, WordOrientation::VERTICAL }); }, "Out of the board.");
     ASSERT_NO_THROW(Crossword{ "WORD" }.insertWord("OWL", { {0, 0}, WordOrientation::VERTICAL }));
 }

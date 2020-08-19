@@ -43,9 +43,8 @@ struct CrosswordParams
 class Crossword final
 {
 public:
-    explicit Crossword(const crosswordString& firstWord, bool removeTouchesWithSameOrientation = true);
+    Crossword(const crosswordString& firstWord, bool removeTouchesWithSameOrientation = true, std::size_t width = 30, std::size_t height = 30);
     [[nodiscard]] std::vector<Utils::insertionParams> testWord(const crosswordString& word) const;
-    //This method doesn't check a word's insertion in other words' cells
     void insertWord(const crosswordString& word, const Utils::WordParams& wordParam);
     void eraseWord(const crosswordString& word);
     [[nodiscard]] Utils::Position getCoordinateStart() const noexcept;
@@ -64,5 +63,7 @@ private:
     LimitKeeper limitKeeper;
     std::size_t letterN = 0;
     std::size_t intersectionN = 0;
-    bool removeTouchesWithSameOrientation = true;
+    bool removeTouchesWithSameOrientation;
+    std::size_t width;
+    std::size_t height;
 };
