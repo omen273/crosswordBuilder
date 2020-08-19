@@ -54,7 +54,7 @@ public:
 
 private:
     [[nodiscard]] std::optional<std::size_t> canBeInserted(const Utils::WordParams& params, const crosswordString& word) const noexcept;
-    bool outsideBorders(const Utils::WordParams& wordParams, std::size_t size) const;
+    [[nodiscard]] bool outsideBorders(const Utils::WordParams& wordParams, std::size_t size) const;
 
     mutable std::unordered_map<std::pair<crosswordString, crosswordString>, std::vector<Utils::Intersection>, Utils::wordsHashOrdered> intersectionCache;
 

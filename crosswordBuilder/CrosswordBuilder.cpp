@@ -12,14 +12,14 @@ using namespace Utils;
 
 namespace
 {
-    struct BuilderParams
+    struct BuilderParams final
     {
         std::vector<insertionParams> insertions;
         std::size_t pos;
         std::size_t wordNumber;
     };
 
-    std::optional<Crossword> build(std::vector<crosswordString> words, std::size_t limit, std::chrono::milliseconds maxCalculationTime)
+    [[nodiscard]] std::optional<Crossword> build(std::vector<crosswordString> words, std::size_t limit, std::chrono::milliseconds maxCalculationTime)
     {
         auto start = std::chrono::steady_clock::now();
         std::stack<BuilderParams> buffer;
