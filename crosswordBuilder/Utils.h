@@ -53,14 +53,14 @@ namespace Utils
         using It = std::vector<std::string>::iterator;
         auto visit = [](It start, It n, It end)
         {
-            auto current = start, last = std::next(start);
+            auto intersected = start, last = std::next(start);
             while (last != n)
             {
                 for (auto it = last; last != n && it != end; ++it)
                 {
-                    if (!findIntersections(*current, *it).empty())  std::iter_swap(last++, it);
+                    if (!findIntersections(*intersected, *it).empty())  std::iter_swap(last++, it);
                 }
-                if (++current == last) break;
+                if (++intersected == last) break;
             }
             return last;
         };
