@@ -66,7 +66,6 @@ TEST(WordRandomizerTest, DISABLED_shuffleNFirstWords)
     Ys.reserve(variantCount);
     transform(counter.begin(), counter.end(), std::back_inserter(Ys), [](const auto& p) {return p.second; });
     static constexpr auto MAX_CHI = 0.7713;
-    auto t = computeChi(Ys, 1.0f / variantCount, TEST_COUNT);
     ASSERT_LE(computeChi(Ys, 1.0f / variantCount, TEST_COUNT), MAX_CHI);
 }
 
