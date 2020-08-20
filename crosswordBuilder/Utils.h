@@ -51,7 +51,7 @@ namespace Utils
         std::vector<std::string>::iterator end, std::size_t n)
     {
         using It = std::vector<std::string>::iterator;
-        auto visit = [](It start, It n, It end)
+        auto findConnectedGroup = [](It start, It n, It end)
         {
             auto intersected = start, last = std::next(start);
             while (last != n)
@@ -69,7 +69,7 @@ namespace Utils
         while(std::distance(start, end) >= n)
         {
             auto last = std::next(start, n);
-            last = visit(start, last, end);
+            last = findConnectedGroup(start, last, end);
             if (std::distance(start, last) == n) return std::vector<std::string>{ start, last };
             start = last;
         }

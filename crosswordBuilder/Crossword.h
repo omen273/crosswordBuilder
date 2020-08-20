@@ -43,7 +43,7 @@ struct CrosswordParams
 class Crossword final
 {
 public:
-    Crossword(const crosswordString& firstWord, bool removeTouchesWithSameOrientation = true, std::size_t width = 30, std::size_t height = 30);
+    explicit Crossword(const crosswordString& firstWord, bool removeTouchesWithSameOrientation = true, std::size_t width = 30, std::size_t height = 30);
     [[nodiscard]] std::vector<Utils::insertionParams> testWord(const crosswordString& word) const;
     void insertWord(const crosswordString& word, const Utils::WordParams& wordParam);
     void eraseWord(const crosswordString& word);

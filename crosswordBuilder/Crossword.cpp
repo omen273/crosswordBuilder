@@ -237,7 +237,6 @@ void Crossword::eraseWord(const crosswordString& word)
         for (std::size_t i = 0; i < word.size(); ++i)
         {
             auto& cell = board[wordParams.start.y + i][wordParams.start.x];
-
             if (cell.orientation() == CellOrientation::BOTH) --intersectionN;
             cell.removeVerticalLetter();
         }
