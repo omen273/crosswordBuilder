@@ -19,7 +19,9 @@ namespace
         std::size_t wordNumber;
     };
 
-    [[nodiscard]] std::optional<Crossword> build(std::vector<crosswordString> words, std::size_t limit, std::chrono::milliseconds maxCalculationTime)
+    [[nodiscard]] std::optional<Crossword> build(std::vector<crosswordString> words,
+            std::size_t limit,
+            std::chrono::milliseconds maxCalculationTime)
     {
         auto start = std::chrono::steady_clock::now();
         std::stack<BuilderParams> buffer;
@@ -34,7 +36,8 @@ namespace
         auto maxHeight = static_cast<int>(limit), maxWidth = static_cast<int>(limit);
         auto getNthBestPosition = [&cross, &words](auto& buildParams)
         {
-            const auto newLetterAmount = cross.getLetterCount() + words[buildParams.wordNumber].size();
+            const auto newLetterAmount = cross.getLetterCount() +
+                    words[buildParams.wordNumber].size();
             const auto it = buildParams.insertions.begin() + buildParams.pos;
             std::nth_element(buildParams.insertions.begin(), it, buildParams.insertions.end(),
                 [newLetterAmount, &cross](const auto& x, const auto& y)
@@ -47,14 +50,15 @@ namespace
                         const auto area = height * width;
                         const auto wordCount = cross.getWordCount();
                         return static_cast<float>(newLetterAmount) / area
-                            + static_cast<float>(params.crosswordIntersectionNumber - wordCount) / wordCount -
+                            + static_cast<float>(params.crosswordIntersectionNumber - wordCount) /
+                            wordCount -
                             static_cast<float>(abs(height - width)) / std::max(height, width);
                     };
                     const auto xMetric = computeMetric(x);
                     const auto yMetric = computeMetric(y);
                     //TODO think about epsilon
-                    return abs(xMetric - yMetric) < std::numeric_limits<float>::epsilon() ? x.wordParams.start < y.wordParams.start :
-                        xMetric > yMetric;
+                    return abs(xMetric - yMetric) < std::numeric_limits<float>::epsilon() ?
+                    x.wordParams.start < y.wordParams.start : xMetric > yMetric;
                 });
             return it->wordParams;
         };
@@ -92,7 +96,8 @@ namespace
                     if (buffer.top().pos++ < buffer.top().insertions.size() - 1)
                     {
                         cross.eraseWord(words[buffer.top().wordNumber]);
-                        cross.insertWord(words[buffer.top().wordNumber], getNthBestPosition(buffer.top()));
+                        cross.insertWord(words[buffer.top().wordNumber],
+                                getNthBestPosition(buffer.top()));
                         break;
                     }
                     cross.eraseWord(words[buffer.top().wordNumber]);
@@ -111,7 +116,10 @@ namespace
                     }
                     cross.eraseWord(words[0]);
                     std::shuffle(words.begin(), words.end(), g);
-                    cross.insertWord(words[0], WordParams{ {0, 0}, WordOrientation::HORIZONTAL } + cross.getCoordinateStart());
+                    cross.insertWord(words[0],
+                            WordParams{ {0, 0},
+                                        WordOrientation::HORIZONTAL } +
+                                        cross.getCoordinateStart());
                     restartFromThisWordCount = 0;
                 }
             }
@@ -120,26 +128,37 @@ namespace
                 cross.insertWord(words[j - 1], getNthBestPosition(buffer.top()));
             }
             auto end = std::chrono::steady_clock::now();
-            if (std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() > maxCalculationTime.count()) return std::nullopt;
+            if (std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() >
+            maxCalculationTime.count()) return std::nullopt;
         }
 
         return cross;
     }
 }
 
-std::optional<Crossword> CrosswordBuilder::build(std::vector<std::string>& words, std::size_t wordCount, std::size_t maxSideSize, std::chrono::milliseconds maxCalculationTime)
+std::optional<Crossword> CrosswordBuilder::build(std::vector<std::string>& words,
+        std::size_t wordCount, std::size_t maxSideSize,
+        std::chrono::milliseconds maxCalculationTime)
 {
-    if (wordCount > words.size()) throw std::runtime_error{ "It is impossible to get more words than it was passed." };
-    if (std::any_of(words.begin(), words.end(), [maxSideSize](const auto& word) {return word.size() > maxSideSize; }))
+    if (wordCount > words.size())
+    {
+        throw std::runtime_error{ "It is impossible "
+                                  "to get more words than it was passed."};
+    }
+    if (std::any_of(words.begin(), words.end(),
+            [maxSideSize](const auto& word) {return word.size() > maxSideSize; }))
     {
         throw std::runtime_error{ "The input consists of too long words." };
     }
-    for (auto itLastPrev = words.begin(), itLast = next(words.begin(), wordCount); itLastPrev != words.end(); itLastPrev = itLast,
+    for (auto itLastPrev = words.begin(),
+            itLast = next(words.begin(), wordCount); itLastPrev != words.end(); itLastPrev = itLast,
         itLast += std::min(distance(words.begin(), itLast), std::distance(itLast, words.end())))
     {
         WordRandomizer::shuffleNFirstWords(itLastPrev, itLast, words.end());
         Utils::toUpper(itLastPrev, itLast);
-        if (auto res = findGroupWithSizeN(words.begin(), itLast, wordCount); res) return ::build(res.value(), maxSideSize, maxCalculationTime);
+        if (auto res = findGroupWithSizeN(words.begin(), itLast, wordCount); res) {
+            return ::build(res.value(), maxSideSize, maxCalculationTime);
+        }
 
     }
     std::string s{ "Impossible to build a crossword which consists of " };

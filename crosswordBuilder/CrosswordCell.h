@@ -24,9 +24,18 @@ class CrosswordCell final
 public:
     [[nodiscard]] auto orientation() const noexcept
     {
-        if (horizontalBorder_ == BordersType::NONE && verticalBorder_ == BordersType::NONE) return CellOrientation::NONE;
-        else if (horizontalBorder_ != BordersType::NONE && verticalBorder_ == BordersType::NONE) return CellOrientation::HORIZONTAL;
-        else if (verticalBorder_ != BordersType::NONE && horizontalBorder_ == BordersType::NONE) return CellOrientation::VERTICAL;
+        if (horizontalBorder_ == BordersType::NONE && verticalBorder_ == BordersType::NONE)
+        {
+            return CellOrientation::NONE;
+        }
+        else if (horizontalBorder_ != BordersType::NONE && verticalBorder_ == BordersType::NONE)
+        {
+            return CellOrientation::HORIZONTAL;
+        }
+        else if (verticalBorder_ != BordersType::NONE && horizontalBorder_ == BordersType::NONE)
+        {
+            return CellOrientation::VERTICAL;
+        }
         return CellOrientation::BOTH;
     }
 
@@ -44,17 +53,47 @@ public:
         verticalBorder_ = BordersType::NONE;
     }
 
-    void addHorizontalBeginLetter(crosswordChar letter) noexcept { addHorizontalLetter(letter, BordersType::BEGIN); }
-    void addHorizontalInsideLetter(crosswordChar letter) noexcept { addHorizontalLetter(letter, BordersType::INSIDE); }
-    void addHorizontalEndLetter(crosswordChar letter) noexcept { addHorizontalLetter(letter, BordersType::END); }
-    void addVerticalBeginLetter(crosswordChar letter) noexcept { addVerticalLetter(letter, BordersType::BEGIN); }
-    void addVerticalInsideLetter(crosswordChar letter) noexcept { addVerticalLetter(letter, BordersType::INSIDE); }
-    void addVerticalEndLetter(crosswordChar letter) noexcept { addVerticalLetter(letter, BordersType::END); }
+    void addHorizontalBeginLetter(crosswordChar letter) noexcept
+    {
+        addHorizontalLetter(letter, BordersType::BEGIN);
+    }
+    void addHorizontalInsideLetter(crosswordChar letter) noexcept
+    {
+        addHorizontalLetter(letter, BordersType::INSIDE);
+    }
+    void addHorizontalEndLetter(crosswordChar letter) noexcept
+    {
+        addHorizontalLetter(letter, BordersType::END);
+    }
+    void addVerticalBeginLetter(crosswordChar letter) noexcept
+    {
+        addVerticalLetter(letter, BordersType::BEGIN);
+    }
+    void addVerticalInsideLetter(crosswordChar letter) noexcept
+    {
+        addVerticalLetter(letter, BordersType::INSIDE);
+    }
+    void addVerticalEndLetter(crosswordChar letter) noexcept
+    {
+        addVerticalLetter(letter, BordersType::END);
+    }
 
-    [[nodiscard]] auto isVerticalBegin() const noexcept { return verticalBorder_ == BordersType::BEGIN; }
-    [[nodiscard]] auto isVerticalEnd() const noexcept { return verticalBorder_ == BordersType::END; }
-    [[nodiscard]] auto isHorizontalBegin() const noexcept { return horizontalBorder_ == BordersType::BEGIN; }
-    [[nodiscard]] auto isHorizontalEnd() const noexcept { return horizontalBorder_ == BordersType::END; }
+    [[nodiscard]] auto isVerticalBegin() const noexcept
+    {
+        return verticalBorder_ == BordersType::BEGIN;
+    }
+    [[nodiscard]] auto isVerticalEnd() const noexcept
+    {
+        return verticalBorder_ == BordersType::END;
+    }
+    [[nodiscard]] auto isHorizontalBegin() const noexcept
+    {
+        return horizontalBorder_ == BordersType::BEGIN;
+    }
+    [[nodiscard]] auto isHorizontalEnd() const noexcept
+    {
+        return horizontalBorder_ == BordersType::END;
+    }
 
 private:
     void addHorizontalLetter(crosswordChar letter, BordersType type) noexcept
