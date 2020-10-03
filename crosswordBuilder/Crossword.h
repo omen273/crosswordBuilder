@@ -43,7 +43,9 @@ struct CrosswordParams
 class Crossword final
 {
 public:
-    explicit Crossword(const crosswordString& firstWord, bool removeTouchesWithSameOrientation = true, std::size_t width = 30, std::size_t height = 30);
+    explicit Crossword(const crosswordString& firstWord,
+            bool removeTouchesWithSameOrientation = true,
+            std::size_t width = 30, std::size_t height = 30);
     [[nodiscard]] std::vector<Utils::insertionParams> testWord(const crosswordString& word) const;
     void insertWord(const crosswordString& word, const Utils::WordParams& wordParam);
     void eraseWord(const crosswordString& word);
@@ -53,10 +55,12 @@ public:
     [[nodiscard]] CrosswordParams getCrossword() const;
 
 private:
-    [[nodiscard]] std::optional<std::size_t> canBeInserted(const Utils::WordParams& params, const crosswordString& word) const noexcept;
+    [[nodiscard]] std::optional<std::size_t> canBeInserted(const Utils::WordParams& params,
+            const crosswordString& word) const noexcept;
     [[nodiscard]] bool outsideBorders(const Utils::WordParams& wordParams, std::size_t size) const;
 
-    mutable std::unordered_map<std::pair<crosswordString, crosswordString>, std::vector<Utils::Intersection>, Utils::wordsHashOrdered> intersectionCache;
+    mutable std::unordered_map<std::pair<crosswordString, crosswordString>,
+    std::vector<Utils::Intersection>, Utils::wordsHashOrdered> intersectionCache;
 
     std::vector<std::vector<CrosswordCell>> board;
     std::unordered_map<crosswordString, Utils::WordParams> words;
