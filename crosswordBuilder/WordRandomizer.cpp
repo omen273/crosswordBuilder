@@ -4,11 +4,13 @@
 #include <stdexcept>
 #include <unordered_map>
 
-std::vector<std::string> WordRandomizer::getRandomWords(const std::vector<std::string>& words, size_t n)
+std::vector<std::string> WordRandomizer::getRandomWords(const std::vector<std::string>& words,
+        size_t n)
 {
     if (n > words.size() - 1) [[unlikely]]
     {
-        throw std::runtime_error{ "The output words' number should be more or equal to the input words' number minus one" };
+        throw std::runtime_error{ "The output words' number should be"
+                                  " more or equal to the input words' number minus one" };
     }
     std::random_device rd;
     std::mt19937 g(rd());

@@ -18,7 +18,17 @@ namespace Utils
         std::size_t firstWordPos;
         std::size_t secondWordPos;
 
-        [[nodiscard]] auto operator<=> (const Intersection&) const = default;
+        [[nodiscard]] friend auto operator==(const Intersection& first, const Intersection& second) noexcept
+        {
+            return std::tie(first.firstWordPos, first.secondWordPos) ==
+                std::tie(second.firstWordPos, second.secondWordPos);
+        }
+
+        [[nodiscard]] friend auto operator<(const Intersection& first, const Intersection& second) noexcept
+        {
+            return std::tie(first.firstWordPos, first.secondWordPos) <
+                std::tie(second.firstWordPos, second.secondWordPos);
+        }
     };
 
     //works only for Latin big letters
@@ -47,7 +57,8 @@ namespace Utils
     };
 
 
-    [[nodiscard]] std::optional<std::vector<std::string>> inline findGroupWithSizeN(std::vector<std::string>::iterator begin,
+    [[nodiscard]] std::optional<std::vector<std::string>> inline findGroupWithSizeN(
+            std::vector<std::string>::iterator begin,
         std::vector<std::string>::iterator end, std::size_t n)
     {
         using It = std::vector<std::string>::iterator;
@@ -58,7 +69,10 @@ namespace Utils
             {
                 for (auto it = last; last != n && it != end; ++it)
                 {
-                    if (!findIntersections(*intersected, *it).empty())  std::iter_swap(last++, it);
+                    if (!findIntersections(*intersected, *it).empty())
+                    {
+                        std::iter_swap(last++, it);
+                    }
                 }
                 if (++intersected == last) break;
             }
@@ -161,9 +175,11 @@ namespace Utils
         Utils::Position start;
         WordOrientation orientation;
 
-        [[nodiscard]] friend auto operator==(const WordParams& first, const WordParams& second) noexcept
+        [[nodiscard]] friend auto operator==(const WordParams& first,
+                const WordParams& second) noexcept
         {
-            return std::tie(first.orientation, first.start) == std::tie(second.orientation, second.start);
+            return std::tie(first.orientation, first.start) ==
+            std::tie(second.orientation, second.start);
         }
 
         auto& operator+=(const Position& pos) noexcept
@@ -199,7 +215,8 @@ namespace Utils
         Limits limits;
         std::size_t crosswordIntersectionNumber;
 
-        [[nodiscard]] friend auto operator==(const insertionParams& first, const insertionParams& second) noexcept
+        [[nodiscard]] friend auto operator==(const insertionParams& first,
+                const insertionParams& second) noexcept
         {
             return std::tie(first.wordParams, first.limits, first.crosswordIntersectionNumber) ==
                 std::tie(second.wordParams, second.limits, second.crosswordIntersectionNumber);
